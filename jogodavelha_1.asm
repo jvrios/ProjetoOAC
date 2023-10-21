@@ -1,229 +1,617 @@
-.data
-    turno:                 .word 0
-    array:                 .word -15, -15, -15, -15, -15, -15, -15, -15, -15
-    linha:                 .asciiz  "   |   |   \n"  # index 1, 5, 9 sao modificados 
-    separador:             .asciiz  "---+---+---\n"
-    player1:               .byte  'x'
-    player2:               .byte  'o'
-    vazio:                 .byte  ' '
-    insira_linha:          .asciiz  "\n\nInsira a linha:"
-    insira_coluna:         .asciiz  "Insira a coluna:"
-    print_jogodor1_ganhou: .asciiz  "\nX (xis) ganhou!\n"
-    print_jogodor2_ganhou: .asciiz  "\nO (bolinha) ganhou!\n"
-    print_empate:          .asciiz  "Empatou!\n"
-    print_jogada_invalida: .asciiz  "\nJogada invalida! Jogue novamente...\n"
+#posiçao que tem q ue digitar no jogo da velha
+# 1|2|3
+# 4|5|6
+# 7|8|9
 
 .text
-    main:
-    inicio:
-        jal print_jogo
-        jal jogada
-        j   verifica
 
-    print_jogo:
-        la $s2, array # i  = *array
-        la $s0, linha # s0 = *linha
-        li $s1, 1     # s1 = index
-    desenho:
-        lw   $t1, ($s2)         # t1 = array[i]
-        bltz $t1, desenha_vazio # vazio     if t1 <  0
-        bgtz $t1, desenha_o     # desenha_o if t1 >  0
-        bgez $t1, desenha_x     # desenha_x if t1 >= 0
-    desenha_o:
-        lb  $t2, player2  # caracter = 'o'
-        j next
-    desenha_x:
-        lb  $t2, player1  # caracter = 'x'
-        j next
-    desenha_vazio:
-        lb  $t2, vazio    # caracter = ' '
-        j next
-    next:
-        add $t1, $s0, $s1          # t1 = *linha[index]
-        sb  $t2, ($t1)             # linha[index] = caracter
-        addi $s2, $s2, 4           # i++
-        addi $s1, $s1, 4           # index += 4
-        li   $t1, 13               # t1 = 13 (index 13 nao existe em linha)
-        beq  $t1, $s1, print_linha # reset linha if s1 == 13 
-        j desenho
-    print_linha:
-        la   $a0, linha                    # a0 = *linha
-        li   $v0, 4                        # print
-        syscall                            # string
-        li   $s1, 1                        # index = 1 
-        li   $t2, 36                       # array.length
-        la   $t3, array                    # t3  = *array
-        add  $t2, $t2, $t3                 # endereco array + 36 (9 words)
-        beq  $s2, $t2, exit_print_desenho  # exit_print_desenho if i == fim do array
-        la   $a0, separador                # a0 = *separador
-        li   $v0, 4                        # print
-        syscall                            # string
-        j desenho
-    exit_print_desenho:
-        jr $ra
+#contador
+ori $a3,$0,9
+ori $a2,$0,0
+main:
 
-    jogada:
-        la $a0, insira_linha
-        li $v0, 4
-        syscall
-        li $v0, 5
-        syscall       # Leitura
-        move $s1, $v0 # linha
-        la $a0, insira_coluna
-        li $v0, 4
-        syscall
-        li $v0, 5
-        syscall       # Leitura
-        move $s2, $v0 # coluna
+ori $t1,$0,1
 
-        li   $t3, 3        # t3 = 3 (tamanho_da_linha)
-        mult $s1, $t3      # linha * 3 (offset_da_linha)
-        mflo $s3           # s3 = offset_da_linha
-        add  $s4, $s3, $s2 # s4 = offset_da_linha + coluna (posicao_vetor)
-        la   $t0, array    # t0 = carrega endereco de array[0]
-        li   $t5, 4        # t1 = 4 (tamanho da word no array)
-        mult $s4, $t5      # 4 * posicao_vetor
-        mflo $s1           # s1 = 4 * posicao_vetor
-        add  $t1, $t0, $s1 # t1 = endereco array[0] + posicao calculada em s1 
-        lw   $t3, turno    # t3 = turno
-        li   $t2, 2        # t2 = 2
-        div  $t3, $t2      # turno / 2
-        mfhi $t2           # t2 = turno % 2
-        li   $t6, 1        # t6 = 1
-        add  $t3, $t3, $t6 # t3 += 1
-        beq  $t2, $zero, jogada_player_1 # se turno par jogador1 se impar jogador2 
-        li   $t5, 1 # jogador2
-        j verifica_jogada
-    jogada_player_1:
-        li   $t5, 0 # jogador1
-    verifica_jogada:
-        lw   $t6, ($t1)       
-        bgez $t6, jogada_invalida # Branch on greater than or equal to zero(0 ou 1 já na posição)
-        j store_jogada
 
-    jogada_invalida:
-        la  $a0, print_jogada_invalida
-        li  $v0, 4
-        syscall
-        j jogada
+li $v0,4
+la $a0,menu
+syscall
 
-    store_jogada:
-        sw   $t3, turno    # turno++
-        sw   $t5, ($t1)
-        jr   $ra
+li $v0,5
+syscall
+move $t0,$v0
+beq $t0,$t1, inicio1
+beq $t0,$0, fim
 
-     verifica:
-        la  $s5, array
-        lw  $s0, 4($s5)      # 012      x1x
-        lw  $s1, 16($s5)     # 345      x1x
-        lw  $s2, 24($s5)     # 678      1x1 1+4+6+7 = 4 || 0
-        lw  $s3, 32($s5)
-        jal soma_empate
-        lw  $s0, 4($s5)      # 012      x1x
-        lw  $s1, 12($s5)     # 345      11x
-        lw  $s2, 16($s5)     # 678      xx1 1+3+4+8 = 4 || 0
-        lw  $s3, 32($s5)
-        jal soma_empate
-        lw  $s0, 4($s5)      # 012      x1x
-        lw  $s1, 16($s5)     # 345      x11
-        lw  $s2, 20($s5)     # 678      1xx 1+4+5+6 = 4 || 0
-        lw  $s3, 24($s5)
-        jal soma_empate
-        lw  $s0, 0($s5)      # 012      1xx
-        lw  $s1, 16($s5)     # 345      x11
-        lw  $s2, 20($s5)     # 678      x1x 0+4+5+7 = 4 || 0
-        lw  $s3, 28($s5)
-        jal soma_empate
-        lw  $s0, 8($s5)      # 012      xx1
-        lw  $s1, 12($s5)     # 345      11x
-        lw  $s2, 16($s5)     # 678      x1x 2+3+4+7 = 4 || 0
-        lw  $s3, 28($s5)
-        jal soma_empate
-        lw  $s0, 0($s5)      # 012      1x1
-        lw  $s1, 8($s5)      # 345      x1x
-        lw  $s2, 16($s5)     # 678      x1x 0+2+4+7 = 4 || 0
-        lw  $s3, 28($s5)
-        jal soma_empate
-        lw  $s0, 0($s5)      # 012      1xx
-        lw  $s1, 16($s5)     # 345      x11
-        lw  $s2, 20($s5)     # 678      1xx 0+4+5+6 = 4 || 0
-        lw  $s3, 24($s5)
-        jal soma_empate
-        lw  $s0, 8($s5)      # 012      xx1
-        lw  $s1, 12($s5)     # 345      11x
-        lw  $s2, 16($s5)     # 678      xx1 2+3+4+8 = 4 || 0
-        lw  $s3, 32($s5)
-        jal soma_empate
+inicio1:
+jal print 
+nop
+inicio:
+#jogador 1 digita a posicçao que deseja
 
-        lw  $s0, 0($s5)      # 012      111 
-        lw  $s1, 4($s5)      # 345      xxx 
-        lw  $s2, 8($s5)      # 678      xxx (0 + 1 + 2) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 12($s5)     # 012      xxx 
-        lw  $s1, 16($s5)     # 345      111 
-        lw  $s2, 20($s5)     # 678      xxx (3 + 4 + 5) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 24($s5)     # 012      xxx 
-        lw  $s1, 28($s5)     # 345      xxx 
-        lw  $s2, 32($s5)     # 678      111 (6 + 7 + 8) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 0($s5)       # 012     1xx
-        lw  $s1, 12($s5)      # 345     1xx
-        lw  $s2, 24($s5)      # 678     1xx (0 + 3 + 6) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 4($s5)       # 012     x1x
-        lw  $s1, 16($s5)      # 345     x1x
-        lw  $s2, 28($s5)      # 678     x1x (1 + 4 + 7) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 8($s5)       # 012     xx1 
-        lw  $s1, 20($s5)      # 345     xx1 
-        lw  $s2, 32($s5)      # 678     xx1 (2 + 5 + 8) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 0($s5)       # 012     1xx
-        lw  $s1, 16($s5)      # 345     x1x
-        lw  $s2, 32($s5)      # 678     xx1 (0 + 4 + 8) = 3 || 0
-        jal soma_ganha
-        lw  $s0, 8($s5)       # 012     xx1
-        lw  $s1, 16($s5)      # 345     x1x
-        lw  $s2, 24($s5)      # 678     1xx (2 + 4 + 6) = 3 || 0
-        jal soma_ganha
 
-        j   inicio            # se não empatou nem ganhou continua o jogo
 
-    soma_ganha:
-        add $t1, $s0, $s1
-        add $t1, $t1, $s2
-        li  $t2, 3
-        beq $t1, $t2,   jogodor2_ganhou
-        beq $t1, $zero, jogodor1_ganhou
-        jr  $ra
-    soma_empate:
-        add $t1, $s0, $s1
-        add $t1, $t1, $s2
-        add $t1, $t1, $s3
-        li  $t2, 4
-        beq $t2, $t1, empate
-        jr  $ra
+lui $s0, 0x1001
+ori $s4,$0,4
 
-    jogodor1_ganhou:
-        jal print_jogo
-        la  $a0, print_jogodor1_ganhou
-        li  $v0, 4
-        syscall
-        j   exit
-    jogodor2_ganhou:
-        jal print_jogo
-        la  $a0, print_jogodor2_ganhou
-        li  $v0, 4
-        syscall
-        j   exit
-    empate:
-        jal print_jogo
-        la $a0, print_empate
-        li $v0, 4
-        syscall
-        j exit
+li $v0,4
+la $a0,jog
+syscall
 
-    exit:
-        li  $v0, 10
-        syscall
+li $v0,5
+syscall
+
+move $t0,$v0
+#multiplica a posicao desejada por 4 pra colocar na memoria
+mult $t0,$s4
+mflo $t4
+
+add $s0,$s0,$t4
+addi $s0,$s0,-4
+
+jal jog1
+nop
+
+addi $a2,$a2,1
+beq $a2,$a3,empate
+jal print
+nop
+sw $t0,0($s0)
+
+
+
+#jogador 2
+lui $s0, 0x1001
+ori $s4,$0,4
+
+
+li $v0,4
+la $a0,jog2
+syscall
+addi $a2,$a2,1
+beq $a2,$a3,empate
+
+li $v0,5
+syscall
+
+move $t0,$v0
+mult $t0,$s4
+mflo $t4
+
+add $s0,$s0,$t4
+addi $s0,$s0,-4
+
+jal joga2
+nop
+addi $s5,$s5,1
+jal print
+nop
+
+
+
+j inicio
+nop
+
+#X jog1
+jog1:
+ori $t0,$0,88
+sw $t0,0($s0)
+
+move $t9,$ra
+addi $sp,$sp,-4 
+sw $t9,($sp) 
+
+jal conferir
+nop
+
+
+lw $t9,($sp) # Copia o item para $t0
+addi $sp,$sp,4 
+move $ra,$t9
+
+
+jr $ra
+nop
+
+#O jog
+joga2:
+ori $t0,$0,79
+sw $t0,0($s0)
+
+
+move $t9,$ra
+addi $sp,$sp,-4 
+sw $t9,($sp) 
+
+jal conferir
+nop
+
+
+lw $t9,($sp) # Copia o item para $t0
+addi $sp,$sp,4 
+move $ra,$t9
+
+jr $ra
+nop
+
+
+######## conferindo se o jogador ganhou
+conferir:
+move $s1,$t0
+
+lui $s0,0x1001
+lw $t0,0($s0)
+lw $t1,4($s0)
+lw $t2,8($s0)
+lw $t3,12($s0)
+lw $t4,16($s0)
+lw $t5,20($s0)
+lw $t6,24($s0)
+lw $t7,28($s0)
+lw $t8,32($s0)
+
+######## vai conferindo se o jogador ganhou
+beq $t0,$s1,lin1
+j pula
+nop
+lin1:
+beq $t1,$s1,lin2
+nop
+j pula
+nop
+lin2:
+beq $t2,$s1,fim
+pula:
+###########
+
+#####################################################################
+
+beq $t4,$s1,lin4
+j pula4
+nop
+lin4:
+beq $t5,$s1,lin5
+nop
+
+j pula4
+nop
+lin5:
+beq $t3,$s1,fim
+pula4:
+###########
+
+#############################################################
+beq $t6,$s1,lin6
+j pula6
+nop
+lin6:
+beq $t7,$s1,lin7
+nop
+
+j pula6
+nop
+lin7:
+beq $t8,$s1,fim
+pula6:
+###########
+
+#######################################################################################conferindo colunS
+beq $t0,$s1,col1
+j pula8
+nop
+col1:
+beq $t3,$s1,col2
+nop
+j pula8
+nop
+col2:
+beq $t6,$s1,fim
+pula8:
+########
+beq $t1,$s1,col3
+j pula9
+nop
+col3:
+beq $t4,$s1,col4
+nop
+j pula9
+nop
+col4:
+beq $t7,$s1,fim
+pula9:
+#######
+beq $t2,$s1,col5
+j pula10
+nop
+col5:
+beq $t5,$s1,col6
+nop
+j pula10
+nop
+col6:
+beq $t8,$s1,fim
+pula10:
+###########################conferindo diagonal
+beq $t0,$s1,diag1
+j pula11
+nop
+diag1:
+beq $t4,$s1,diag2
+nop
+j pula11
+nop
+diag2:
+beq $t8,$s1,fim
+pula11:
+#######
+beq $t2,$s1,diag3
+j pula12
+nop
+diag3:
+beq $t4,$s1,diag4
+nop
+j pula12
+nop
+diag4:
+beq $t6,$s1,fim
+pula12:
+
+
+jr $ra
+nop
+
+#funcao empate
+empate:
+li $v0,4
+la $a0,empate1
+syscall
+
+
+jal print 
+nop
+
+li $v0,10 
+syscall
+
+
+#funcao fim
+fim:
+ori $s6,$0,79
+ori $s7,$0,88
+beq  $s1,$s7 gan1
+beq  $s1,$s6 gan2
+gan1:
+
+li $v0,4
+la $a0,gan
+syscall
+j f
+gan2:
+li $v0,4
+la $a0,gann
+syscall
+f:
+
+jal print
+nop
+
+
+li $v0,10 
+syscall
+
+
+######################################################################################
+
+#printa o jogo da velha
+print:
+
+ori $s1,$0,88
+ori $s2,$0,79
+ori $s3,$0,45
+
+lui $s0,0x1001
+lw $t0,0($s0)
+lw $t1,4($s0)
+lw $t2,8($s0)
+lw $t3,12($s0)
+lw $t4,16($s0)
+lw $t5,20($s0)
+lw $t6,24($s0)
+lw $t7,28($s0)
+lw $t8,32($s0)
+
+###############
+beq $t0,$s1,op1
+nop
+beq $t0,$s2,op2
+nop
+beq $t0,$s3,op3
+nop
+op1:
+li $v0,4
+la $a0,X
+syscall
+
+j prox
+nop
+op2:
+li $v0,4
+la $a0,O
+syscall
+j prox
+nop
+op3:
+li $v0,4
+la $a0,traco
+syscall
+
+prox:
+li $v0,4
+la $a0,barra
+syscall
+#################
+beq $t1,$s1,op4
+nop
+beq $t1,$s2,op5
+nop
+beq $t1,$s3,op6
+nop
+op4:
+li $v0,4
+la $a0,X
+syscall
+
+j prox1
+nop
+op5:
+li $v0,4
+la $a0,O
+syscall
+j prox1
+nop
+op6:
+li $v0,4
+la $a0,traco
+syscall
+
+prox1:
+li $v0,4
+la $a0,barra
+syscall
+###############
+beq $t2,$s1,op7
+nop
+beq $t2,$s2,op8
+nop
+beq $t2,$s3,op9
+nop
+op7:
+li $v0,4
+la $a0,X
+syscall
+
+j prox2
+nop
+op8:
+li $v0,4
+la $a0,O
+syscall
+j prox2
+nop
+op9:
+li $v0,4
+la $a0,traco
+syscall
+
+prox2:
+li $v0,4
+la $a0,barran
+syscall
+###############
+beq $t3,$s1,op10
+nop
+beq $t3,$s2,op11
+nop
+beq $t3,$s3,op12
+nop
+op10:
+li $v0,4
+la $a0,X
+syscall
+
+j prox3
+nop
+op11:
+li $v0,4
+la $a0,O
+syscall
+j prox3
+nop
+op12:
+li $v0,4
+la $a0,traco
+syscall
+
+prox3:
+li $v0,4
+la $a0,barra
+syscall
+##################
+
+beq $t4,$s1,op13
+nop
+beq $t4,$s2,op14
+nop
+beq $t4,$s3,op15
+nop
+op13:
+li $v0,4
+la $a0,X
+syscall
+
+j prox4
+nop
+op14:
+li $v0,4
+la $a0,O
+syscall
+j prox4
+nop
+op15:
+li $v0,4
+la $a0,traco
+syscall
+
+prox4:
+li $v0,4
+la $a0,barra
+syscall
+
+##################
+
+beq $t5,$s1,op16
+nop
+beq $t5,$s2,op17
+nop
+beq $t5,$s3,op18
+nop
+op16:
+li $v0,4
+la $a0,X
+syscall
+
+j prox5
+nop
+op17:
+li $v0,4
+la $a0,O
+syscall
+j prox5
+nop
+op18:
+li $v0,4
+la $a0,traco
+syscall
+
+prox5:
+li $v0,4
+la $a0,barran
+syscall
+
+#############
+
+
+beq $t6,$s1,op19
+nop
+beq $t6,$s2,op20
+nop
+beq $t6,$s3,op21
+nop
+op19:
+li $v0,4
+la $a0,X
+syscall
+
+j prox6
+nop
+op20:
+li $v0,4
+la $a0,O
+syscall
+j prox6
+nop
+op21:
+li $v0,4
+la $a0,traco
+syscall
+
+prox6:
+li $v0,4
+la $a0,barra
+syscall
+
+#############
+
+
+beq $t7,$s1,op22
+nop
+beq $t7,$s2,op23
+nop
+beq $t7,$s3,op24
+nop
+op22:
+li $v0,4
+la $a0,X
+syscall
+
+j prox7
+nop
+op23:
+li $v0,4
+la $a0,O
+syscall
+j prox7
+nop
+op24:
+li $v0,4
+la $a0,traco
+syscall
+
+prox7:
+li $v0,4
+la $a0,barra
+syscall
+
+#############
+
+beq $t8,$s1,op25
+nop
+beq $t8,$s2,op26
+nop
+beq $t8,$s3,op27
+nop
+op25:
+li $v0,4
+la $a0,X
+syscall
+
+j prox8
+nop
+op26:
+li $v0,4
+la $a0,O
+syscall
+j prox8
+nop
+op27:
+li $v0,4
+la $a0,traco
+syscall
+
+prox8:
+li $v0,4
+la $a0,barran
+syscall
+
+
+
+jr $ra
+nop
+
+.data
+velha: .word 45,45,45,45,45,45,45,45,45
+buffel: .space 128
+jog: .asciiz "jogador 1 digita a posicao:\n" 
+jog2: .asciiz "jogador 2 digita a posicao:\n" 
+
+gan: .asciiz "jogador 1 ganhou\n"
+gann: .asciiz "jogador 2 ganhou\n"
+barra: .asciiz "|"
+barran: .asciiz "\n"
+X: .asciiz "X"
+O: .asciiz "O"
+traco: .asciiz "-"
+empate1: .asciiz "empate \n"
+
+
+menu: .asciiz "1-iniciar jogo \n0-fim \n" 
