@@ -4,7 +4,7 @@ linha: .asciiz "---+---+---\n"
 newline: .asciiz "\n"
 X: .asciiz " X "
 O: .asciiz " O "
-espaco: .asciiz " "
+espaco: .asciiz "   "
 return1: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
 return2: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
 return3: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
@@ -19,6 +19,7 @@ turno: .word 0
 player1: .asciiz "Player 1's turn\n"
 player2: .asciiz "Player 2's turn\n"
 invalido: .asciiz "Movimento inválido\n"
+player_prompt: .asciiz "Enter a number (1-9): "
 .text
 main:
     # Initialize the board with empty spaces
@@ -44,7 +45,9 @@ pos1:
     # If the input value is neither 0 nor 1, print " "
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, coluna
+    li $v0, 4
     syscall
     j pos2
 pos2:
@@ -57,7 +60,9 @@ pos2:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, coluna
+    li $v0, 4
     syscall
     j pos3
 pos3:
@@ -70,7 +75,9 @@ pos3:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, newline
+    li $v0, 4
     syscall
     la $a0, linha
     syscall
@@ -86,7 +93,9 @@ pos4:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, coluna
+    li $v0, 4
     syscall
     j pos5
 pos5:
@@ -99,7 +108,9 @@ pos5:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, coluna
+    li $v0, 4
     syscall
     j pos6
 pos6:
@@ -112,7 +123,9 @@ pos6:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, newline
+    li $v0, 4
     syscall
     la $a0, linha
     syscall
@@ -127,7 +140,9 @@ pos7:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, coluna
+    li $v0, 4
     syscall
     j pos8
 pos8:
@@ -140,7 +155,9 @@ pos8:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, coluna
+    li $v0, 4
     syscall
     j pos9
 pos9:
@@ -153,15 +170,26 @@ pos9:
 
     la $a0, espaco
     li $v0, 4
+    syscall
     la $a0, newline
+    li $v0, 4
     syscall
     j game_loop
 
 game_loop:
-    # Player input
+    # Prompt for player input
+    li $v0, 4
+    la $a0, player_prompt
+    syscall
+
+    # Read player input (expecting an integer between 1 and 9)
     li $v0, 5
     syscall
     move $t4, $v0  # $t4 now holds the player's input (1-9)
+    li $t5, 1
+    blt $t4, $t5, mov_invalido
+    li $t5, 9
+    bgt $t4, $t5, mov_invalido
     li $t5, 1        # Load the value 1 into $t5
     beq $t4, $t5, r1  # Branch to "is_equal" if $t4 == $t5
     li $t5, 2        # Load the value 1 into $t5
@@ -181,17 +209,7 @@ game_loop:
     li $t5, 9        # Load the value 1 into $t5
     beq $t4, $t5, r9  # Branch to "is_equal" if $t4 == $t5
 
-    # Update the board based on player input
-    li $t0, 49       # ASCII code for '1'
-    sub $t4, $t4, $t0  # Adjust the input to 0-8
-    lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
-
-    lw $t0, turno
-    # Increment the value of "turn" by 1
-    addi $t0, $t0, 1
-    sw $t0, turno
-    j main
+   
 
 r1:
     lw $t7, return1
@@ -201,7 +219,11 @@ r1:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return1 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r2:
     lw $t7, return2
     bnez $t7, mov_invalido
@@ -209,7 +231,11 @@ r2:
     li $t0, 1
     add $t1, $t1, $t0 
     sw $t1, return2 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r3:
     lw $t7, return3
     bnez $t7, mov_invalido
@@ -217,7 +243,11 @@ r3:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return3 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r4:
     lw $t7, return4
     bnez $t7, mov_invalido
@@ -225,7 +255,11 @@ r4:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return4 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r5:
     lw $t7, return5
     bnez $t7, mov_invalido
@@ -233,7 +267,11 @@ r5:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return5 
-    jr $ra   
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main   
 r6:
     lw $t7, return6
     bnez $t7, mov_invalido
@@ -241,7 +279,11 @@ r6:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return6 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r7:
     lw $t7, return7
     bnez $t7, mov_invalido
@@ -249,7 +291,11 @@ r7:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return7 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r8:
     lw $t7, return8
     bnez $t7, mov_invalido
@@ -257,7 +303,11 @@ r8:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return8 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 r9:
     lw $t7, return9
     bnez $t7, mov_invalido
@@ -265,7 +315,11 @@ r9:
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return9 
-    jr $ra
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j main
 is_zero:
     la $a0, X
     li $v0, 4
