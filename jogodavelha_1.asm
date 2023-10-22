@@ -36,9 +36,9 @@ init_board_loop:
 pos1:
     lw $t0, return1
      # Check if the input value is 0
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     # If the input value is neither 0 nor 1, print " "
@@ -50,9 +50,9 @@ pos1:
 pos2:
     lw $t0, return2
 
-    li $t1, 0
+        li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -63,9 +63,9 @@ pos2:
 pos3:
     lw $t0, return3
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -78,9 +78,9 @@ pos3:
 pos4:
     lw $t0, return4
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
 
@@ -92,9 +92,9 @@ pos4:
 pos5:
     lw $t0, return5
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -105,9 +105,9 @@ pos5:
 pos6:
     lw $t0, return6
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -120,9 +120,9 @@ pos6:
 pos7:
     lw $t0, return7
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -133,9 +133,9 @@ pos7:
 pos8:
     lw $t0, return8
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -146,9 +146,9 @@ pos8:
 pos9:
     lw $t0, return9
 
-    li $t1, 0
+    li $t1, 1
     beq $t0, $t1, is_zero
-    li $t2, 1
+    li $t2, 2
     beq $t0, $t2, is_one
 
     la $a0, espaco
@@ -197,55 +197,73 @@ r1:
     lw $t7, return1
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1 #$t1 will be 2 if it's odd, 1 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return1 
     jr $ra
 r2:
     lw $t7, return2
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0 
     sw $t1, return2 
     jr $ra
 r3:
     lw $t7, return3
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return3 
     jr $ra
 r4:
     lw $t7, return4
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return4 
     jr $ra
 r5:
     lw $t7, return5
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return5 
     jr $ra   
 r6:
     lw $t7, return6
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return6 
     jr $ra
 r7:
     lw $t7, return7
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return7 
     jr $ra
 r8:
     lw $t7, return8
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return8 
     jr $ra
 r9:
     lw $t7, return9
     bnez $t7, mov_invalido
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
     sw $t1, return9 
     jr $ra
 is_zero:
