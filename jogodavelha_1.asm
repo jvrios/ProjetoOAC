@@ -22,19 +22,8 @@ vitoria2_prompt: .asciiz "Vitoria jogador 2 :p"
 empate_prompt: .asciiz "Empate :("
 .text
     
- main:
-    li $t4, 1
-    lw $t0, turno
-    move $t0, $t4
+
 pos1:
-    lw $a0, return5
-
-    li $v0, 1
-    syscall
-
-    la $a0, newline
-    li $v0, 4
-    syscall
     lw $t0, return1
     li $t1, 1
     beq $t0, $t1, printOne1
@@ -289,37 +278,37 @@ game_loop:
     la $a0, newline
     li $v0, 4
     syscall
-    # Prompt for player input
+
     li $v0, 4
     la $a0, player_prompt
     syscall
 
-    # Read player input (expecting an integer between 1 and 9)
+
     li $v0, 5
     syscall
-    move $t4, $v0  # $t4 now holds the player's input (1-9)
+    move $t4, $v0  
     li $t5, 1
     blt $t4, $t5, mov_invalido
     li $t5, 9
     bgt $t4, $t5, mov_invalido
-    li $t5, 1        # Load the value 1 into $t5
-    beq $t4, $t5, r1  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 2        # Load the value 1 into $t5
-    beq $t4, $t5, r2  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 3        # Load the value 1 into $t5
-    beq $t4, $t5, r3  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 4        # Load the value 1 into $t5
-    beq $t4, $t5, r4  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 5        # Load the value 1 into $t5
-    beq $t4, $t5, r5  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 6        # Load the value 1 into $t5
-    beq $t4, $t5, r6  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 7        # Load the value 1 into $t5
-    beq $t4, $t5, r7  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 8        # Load the value 1 into $t5
-    beq $t4, $t5, r8  # Branch to "is_equal" if $t4 == $t5
-    li $t5, 9        # Load the value 1 into $t5
-    beq $t4, $t5, r9  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 1        
+    beq $t4, $t5, r1  
+    li $t5, 2        
+    beq $t4, $t5, r2  
+    li $t5, 3        
+    beq $t4, $t5, r3  
+    li $t5, 4        
+    beq $t4, $t5, r4  
+    li $t5, 5        
+    beq $t4, $t5, r5  
+    li $t5, 6        
+    beq $t4, $t5, r6  
+    li $t5, 7        
+    beq $t4, $t5, r7  
+    li $t5, 8        
+    beq $t4, $t5, r8  
+    li $t5, 9       
+    beq $t4, $t5, r9 
 
    
 
@@ -329,13 +318,13 @@ r1:
 
     lw $t5, turno
 
-    andi $t1, $t5, 1 #$t1 will be 2 if it's odd, 1 if it's even
+    andi $t1, $t5, 1 
 
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return1 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -343,12 +332,12 @@ r2:
     lw $t7, return2
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1 
     li $t0, 1
     add $t1, $t1, $t0 
     sw $t1, return2 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -356,12 +345,12 @@ r3:
     lw $t7, return3
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return3 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -369,12 +358,12 @@ r4:
     lw $t7, return4
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1 
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return4 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+    
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -382,12 +371,12 @@ r5:
     lw $t7, return5
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1 
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return5 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1   
@@ -395,12 +384,12 @@ r6:
     lw $t7, return6
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return6 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -408,12 +397,12 @@ r7:
     lw $t7, return7
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return7 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -421,12 +410,12 @@ r8:
     lw $t7, return8
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return8 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+    
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -434,12 +423,12 @@ r9:
     lw $t7, return9
     bnez $t7, mov_invalido
     lw $t5, turno
-    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    andi $t1, $t5, 1
     li $t0, 1
     add $t1, $t1, $t0
     sw $t1, return9 
     lw $t0, turno
-    # Increment the value of "turn" by 1
+   
     addi $t0, $t0, 1
     sw $t0, turno
     j pos1
@@ -461,7 +450,7 @@ mov_invalido:
 
 verificarVitoria:
 
-    # Verificação jogador 1
+   
     jal caso1O
     jal caso1X
     jal caso2O
@@ -480,7 +469,7 @@ verificarVitoria:
     jal caso8X
     jal empate
 
-    # erificar X
+   
     caso1O:
         c1l1:
             lw $t7, return1
@@ -758,5 +747,5 @@ empate:
         syscall
         j exit
 exit:
-  li    $v0, 10                       # Finalizar aplicacao
+  li    $v0, 10                    
   syscall
