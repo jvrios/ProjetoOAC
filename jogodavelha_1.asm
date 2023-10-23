@@ -22,9 +22,9 @@ invalido: .asciiz "Movimento inválido\n"
 player_prompt: .asciiz "Enter a number (1-9): "
 .text
 main:
-    j pos1
     
 pos1:
+    li $t4, 1
     lw $t0, return1
     li $t1, 1
     beq $t0, $t1, is_one
@@ -37,6 +37,7 @@ pos1:
     syscall
     j pos2
 pos2:
+    li $t4, 2
     la $a0, coluna
     li $v0, 4
     syscall
@@ -51,6 +52,7 @@ pos2:
     syscall
     j pos3
 pos3:
+    li $t4, 3
     la $a0, coluna
     li $v0, 4
     syscall
@@ -65,6 +67,7 @@ pos3:
     syscall
     j pos4
 pos4:
+    li $t4, 4
     la $a0, newline
     li $v0, 4
     syscall
@@ -81,6 +84,7 @@ pos4:
     syscall
     j pos5
 pos5:
+    li $t4, 5
     la $a0, coluna
     li $v0, 4
     syscall
@@ -95,6 +99,7 @@ pos5:
     syscall
     j pos6
 pos6:
+    li $t4, 6
     la $a0, coluna
     li $v0, 4
     syscall
@@ -109,6 +114,7 @@ pos6:
     syscall
     j pos7
 pos7:
+    li $t4, 7
     la $a0, newline
     li $v0, 4
     syscall
@@ -125,6 +131,7 @@ pos7:
     syscall
     j pos8
 pos8:
+    li $t4, 8
     la $a0, coluna
     li $v0, 4
     syscall
@@ -139,6 +146,7 @@ pos8:
     syscall
     j pos9
 pos9:
+    li $t4, 9
     la $a0, coluna
     li $v0, 4
     syscall
