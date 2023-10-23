@@ -1,617 +1,762 @@
-#posiçao que tem q ue digitar no jogo da velha
-# 1|2|3
-# 4|5|6
-# 7|8|9
-
-.text
-
-#contador
-ori $a3,$0,9
-ori $a2,$0,0
-main:
-
-ori $t1,$0,1
-
-
-li $v0,4
-la $a0,menu
-syscall
-
-li $v0,5
-syscall
-move $t0,$v0
-beq $t0,$t1, inicio1
-beq $t0,$0, fim
-
-inicio1:
-jal print 
-nop
-inicio:
-#jogador 1 digita a posicçao que deseja
-
-
-
-lui $s0, 0x1001
-ori $s4,$0,4
-
-li $v0,4
-la $a0,jog
-syscall
-
-li $v0,5
-syscall
-
-move $t0,$v0
-#multiplica a posicao desejada por 4 pra colocar na memoria
-mult $t0,$s4
-mflo $t4
-
-add $s0,$s0,$t4
-addi $s0,$s0,-4
-
-jal jog1
-nop
-
-addi $a2,$a2,1
-beq $a2,$a3,empate
-jal print
-nop
-sw $t0,0($s0)
-
-
-
-#jogador 2
-lui $s0, 0x1001
-ori $s4,$0,4
-
-
-li $v0,4
-la $a0,jog2
-syscall
-addi $a2,$a2,1
-beq $a2,$a3,empate
-
-li $v0,5
-syscall
-
-move $t0,$v0
-mult $t0,$s4
-mflo $t4
-
-add $s0,$s0,$t4
-addi $s0,$s0,-4
-
-jal joga2
-nop
-addi $s5,$s5,1
-jal print
-nop
-
-
-
-j inicio
-nop
-
-#X jog1
-jog1:
-ori $t0,$0,88
-sw $t0,0($s0)
-
-move $t9,$ra
-addi $sp,$sp,-4 
-sw $t9,($sp) 
-
-jal conferir
-nop
-
-
-lw $t9,($sp) # Copia o item para $t0
-addi $sp,$sp,4 
-move $ra,$t9
-
-
-jr $ra
-nop
-
-#O jog
-joga2:
-ori $t0,$0,79
-sw $t0,0($s0)
-
-
-move $t9,$ra
-addi $sp,$sp,-4 
-sw $t9,($sp) 
-
-jal conferir
-nop
-
-
-lw $t9,($sp) # Copia o item para $t0
-addi $sp,$sp,4 
-move $ra,$t9
-
-jr $ra
-nop
-
-
-######## conferindo se o jogador ganhou
-conferir:
-move $s1,$t0
-
-lui $s0,0x1001
-lw $t0,0($s0)
-lw $t1,4($s0)
-lw $t2,8($s0)
-lw $t3,12($s0)
-lw $t4,16($s0)
-lw $t5,20($s0)
-lw $t6,24($s0)
-lw $t7,28($s0)
-lw $t8,32($s0)
-
-######## vai conferindo se o jogador ganhou
-beq $t0,$s1,lin1
-j pula
-nop
-lin1:
-beq $t1,$s1,lin2
-nop
-j pula
-nop
-lin2:
-beq $t2,$s1,fim
-pula:
-###########
-
-#####################################################################
-
-beq $t4,$s1,lin4
-j pula4
-nop
-lin4:
-beq $t5,$s1,lin5
-nop
-
-j pula4
-nop
-lin5:
-beq $t3,$s1,fim
-pula4:
-###########
-
-#############################################################
-beq $t6,$s1,lin6
-j pula6
-nop
-lin6:
-beq $t7,$s1,lin7
-nop
-
-j pula6
-nop
-lin7:
-beq $t8,$s1,fim
-pula6:
-###########
-
-#######################################################################################conferindo colunS
-beq $t0,$s1,col1
-j pula8
-nop
-col1:
-beq $t3,$s1,col2
-nop
-j pula8
-nop
-col2:
-beq $t6,$s1,fim
-pula8:
-########
-beq $t1,$s1,col3
-j pula9
-nop
-col3:
-beq $t4,$s1,col4
-nop
-j pula9
-nop
-col4:
-beq $t7,$s1,fim
-pula9:
-#######
-beq $t2,$s1,col5
-j pula10
-nop
-col5:
-beq $t5,$s1,col6
-nop
-j pula10
-nop
-col6:
-beq $t8,$s1,fim
-pula10:
-###########################conferindo diagonal
-beq $t0,$s1,diag1
-j pula11
-nop
-diag1:
-beq $t4,$s1,diag2
-nop
-j pula11
-nop
-diag2:
-beq $t8,$s1,fim
-pula11:
-#######
-beq $t2,$s1,diag3
-j pula12
-nop
-diag3:
-beq $t4,$s1,diag4
-nop
-j pula12
-nop
-diag4:
-beq $t6,$s1,fim
-pula12:
-
-
-jr $ra
-nop
-
-#funcao empate
-empate:
-li $v0,4
-la $a0,empate1
-syscall
-
-
-jal print 
-nop
-
-li $v0,10 
-syscall
-
-
-#funcao fim
-fim:
-ori $s6,$0,79
-ori $s7,$0,88
-beq  $s1,$s7 gan1
-beq  $s1,$s6 gan2
-gan1:
-
-li $v0,4
-la $a0,gan
-syscall
-j f
-gan2:
-li $v0,4
-la $a0,gann
-syscall
-f:
-
-jal print
-nop
-
-
-li $v0,10 
-syscall
-
-
-######################################################################################
-
-#printa o jogo da velha
-print:
-
-ori $s1,$0,88
-ori $s2,$0,79
-ori $s3,$0,45
-
-lui $s0,0x1001
-lw $t0,0($s0)
-lw $t1,4($s0)
-lw $t2,8($s0)
-lw $t3,12($s0)
-lw $t4,16($s0)
-lw $t5,20($s0)
-lw $t6,24($s0)
-lw $t7,28($s0)
-lw $t8,32($s0)
-
-###############
-beq $t0,$s1,op1
-nop
-beq $t0,$s2,op2
-nop
-beq $t0,$s3,op3
-nop
-op1:
-li $v0,4
-la $a0,X
-syscall
-
-j prox
-nop
-op2:
-li $v0,4
-la $a0,O
-syscall
-j prox
-nop
-op3:
-li $v0,4
-la $a0,traco
-syscall
-
-prox:
-li $v0,4
-la $a0,barra
-syscall
-#################
-beq $t1,$s1,op4
-nop
-beq $t1,$s2,op5
-nop
-beq $t1,$s3,op6
-nop
-op4:
-li $v0,4
-la $a0,X
-syscall
-
-j prox1
-nop
-op5:
-li $v0,4
-la $a0,O
-syscall
-j prox1
-nop
-op6:
-li $v0,4
-la $a0,traco
-syscall
-
-prox1:
-li $v0,4
-la $a0,barra
-syscall
-###############
-beq $t2,$s1,op7
-nop
-beq $t2,$s2,op8
-nop
-beq $t2,$s3,op9
-nop
-op7:
-li $v0,4
-la $a0,X
-syscall
-
-j prox2
-nop
-op8:
-li $v0,4
-la $a0,O
-syscall
-j prox2
-nop
-op9:
-li $v0,4
-la $a0,traco
-syscall
-
-prox2:
-li $v0,4
-la $a0,barran
-syscall
-###############
-beq $t3,$s1,op10
-nop
-beq $t3,$s2,op11
-nop
-beq $t3,$s3,op12
-nop
-op10:
-li $v0,4
-la $a0,X
-syscall
-
-j prox3
-nop
-op11:
-li $v0,4
-la $a0,O
-syscall
-j prox3
-nop
-op12:
-li $v0,4
-la $a0,traco
-syscall
-
-prox3:
-li $v0,4
-la $a0,barra
-syscall
-##################
-
-beq $t4,$s1,op13
-nop
-beq $t4,$s2,op14
-nop
-beq $t4,$s3,op15
-nop
-op13:
-li $v0,4
-la $a0,X
-syscall
-
-j prox4
-nop
-op14:
-li $v0,4
-la $a0,O
-syscall
-j prox4
-nop
-op15:
-li $v0,4
-la $a0,traco
-syscall
-
-prox4:
-li $v0,4
-la $a0,barra
-syscall
-
-##################
-
-beq $t5,$s1,op16
-nop
-beq $t5,$s2,op17
-nop
-beq $t5,$s3,op18
-nop
-op16:
-li $v0,4
-la $a0,X
-syscall
-
-j prox5
-nop
-op17:
-li $v0,4
-la $a0,O
-syscall
-j prox5
-nop
-op18:
-li $v0,4
-la $a0,traco
-syscall
-
-prox5:
-li $v0,4
-la $a0,barran
-syscall
-
-#############
-
-
-beq $t6,$s1,op19
-nop
-beq $t6,$s2,op20
-nop
-beq $t6,$s3,op21
-nop
-op19:
-li $v0,4
-la $a0,X
-syscall
-
-j prox6
-nop
-op20:
-li $v0,4
-la $a0,O
-syscall
-j prox6
-nop
-op21:
-li $v0,4
-la $a0,traco
-syscall
-
-prox6:
-li $v0,4
-la $a0,barra
-syscall
-
-#############
-
-
-beq $t7,$s1,op22
-nop
-beq $t7,$s2,op23
-nop
-beq $t7,$s3,op24
-nop
-op22:
-li $v0,4
-la $a0,X
-syscall
-
-j prox7
-nop
-op23:
-li $v0,4
-la $a0,O
-syscall
-j prox7
-nop
-op24:
-li $v0,4
-la $a0,traco
-syscall
-
-prox7:
-li $v0,4
-la $a0,barra
-syscall
-
-#############
-
-beq $t8,$s1,op25
-nop
-beq $t8,$s2,op26
-nop
-beq $t8,$s3,op27
-nop
-op25:
-li $v0,4
-la $a0,X
-syscall
-
-j prox8
-nop
-op26:
-li $v0,4
-la $a0,O
-syscall
-j prox8
-nop
-op27:
-li $v0,4
-la $a0,traco
-syscall
-
-prox8:
-li $v0,4
-la $a0,barran
-syscall
-
-
-
-jr $ra
-nop
-
 .data
-velha: .word 45,45,45,45,45,45,45,45,45
-buffel: .space 128
-jog: .asciiz "jogador 1 digita a posicao:\n" 
-jog2: .asciiz "jogador 2 digita a posicao:\n" 
+coluna: .asciiz "|"
+linha: .asciiz "---+---+---\n"
+newline: .asciiz "\n"
+O: .asciiz " O "
+X: .asciiz " X "
+espaco: .asciiz "   "
+return1: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return2: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return3: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return4: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return5: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return6: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return7: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return8: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+return9: .word 0		#recebe 0(espaco) 1 (X) ou 2 (O)
+turno: .word 0
+invalido: .asciiz "Movimento inválido\n"
+player_prompt: .asciiz "Entre com um numero (1-9): "
+vitoria1_prompt: .asciiz "Vitoria jogador 1 :p"
+vitoria2_prompt: .asciiz "Vitoria jogador 2 :p"
+empate_prompt: .asciiz "Empate :("
+.text
+    
+ main:
+    li $t4, 1
+    lw $t0, turno
+    move $t0, $t4
+pos1:
+    lw $a0, return5
 
-gan: .asciiz "jogador 1 ganhou\n"
-gann: .asciiz "jogador 2 ganhou\n"
-barra: .asciiz "|"
-barran: .asciiz "\n"
-X: .asciiz "X"
-O: .asciiz "O"
-traco: .asciiz "-"
-empate1: .asciiz "empate \n"
+    li $v0, 1
+    syscall
+
+    la $a0, newline
+    li $v0, 4
+    syscall
+    lw $t0, return1
+    li $t1, 1
+    beq $t0, $t1, printOne1
+
+    li $t2, 2
+    beq $t0, $t2, printTwo1
+
+    j printEspaco1
+
+    printOne1:
+        jal is_one
+        j continuar1
+
+    printTwo1:
+        jal is_two
+        j continuar1
+
+    printEspaco1:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar1:
+pos2:
+    la $a0, coluna
+    li $v0, 4
+    syscall
+    lw $t0, return2
+
+    li $t1, 1
+    beq $t0, $t1, printOne2
+
+    li $t2, 2
+    beq $t0, $t2, printTwo2
+
+    j printEspaco2
+
+    printOne2:
+        jal is_one
+        j continuar2
+
+    printTwo2:
+        jal is_two
+        j continuar2
+
+    printEspaco2:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar2:
+
+pos3:
+    la $a0, coluna
+    li $v0, 4
+    syscall
+    lw $t0, return3
+    li $t1, 1
+    beq $t0, $t1, printOne3
+
+    li $t2, 2
+    beq $t0, $t2, printTwo3
+
+    j printEspaco3
+
+    printOne3:
+        jal is_one
+        j continuar3
+
+    printTwo3:
+        jal is_two
+        j continuar3
+
+    printEspaco3:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar3:
+pos4:
+    la $a0, newline
+    li $v0, 4
+    syscall
+    la $a0, linha
+    syscall
+    lw $t0, return4
+    li $t1, 1
+    beq $t0, $t1, printOne4
+
+    li $t2, 2
+    beq $t0, $t2, printTwo4
+
+    j printEspaco4
+
+    printOne4:
+        jal is_one
+        j continuar4
+
+    printTwo4:
+        jal is_two
+        j continuar4
+
+    printEspaco4:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar4:
+pos5:
+    la $a0, coluna
+    li $v0, 4
+    syscall
+    lw $t0, return5
+    li $t1, 1
+    beq $t0, $t1, printOne5
+
+    li $t2, 2
+    beq $t0, $t2, printTwo5
+
+    j printEspaco5
+
+    printOne5:
+        jal is_one
+        j continuar5
+
+    printTwo5:
+        jal is_two
+        j continuar5
+
+    printEspaco5:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar5:
+pos6:
+    la $a0, coluna
+    li $v0, 4
+    syscall
+    lw $t0, return6
+    li $t1, 1
+    beq $t0, $t1, printOne6
+
+    li $t2, 2
+    beq $t0, $t2, printTwo6
+
+    j printEspaco6
+
+    printOne6:
+        jal is_one
+        j continuar6
+
+    printTwo6:
+        jal is_two
+        j continuar6
+
+    printEspaco6:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar6:
+pos7:
+    la $a0, newline
+    li $v0, 4
+    syscall
+    la $a0, linha
+    syscall
+    lw $t0, return7
+    li $t1, 1
+    beq $t0, $t1, printOne7
+
+    li $t2, 2
+    beq $t0, $t2, printTwo7
+
+    j printEspaco7
+
+    printOne7:
+        jal is_one
+        j continuar7
+
+    printTwo7:
+        jal is_two
+        j continuar7
+
+    printEspaco7:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar7:
+pos8:
+    la $a0, coluna
+    li $v0, 4
+    syscall
+    lw $t0, return8
+    li $t1, 1
+    beq $t0, $t1, printOne8
+
+    li $t2, 2
+    beq $t0, $t2, printTwo8
+
+    j printEspaco8
+
+    printOne8:
+        jal is_one
+        j continuar8
+
+    printTwo8:
+        jal is_two
+        j continuar8
+
+    printEspaco8:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar8:
+pos9:
+    la $a0, coluna
+    li $v0, 4
+    syscall
+    lw $t0, return9
+
+    li $t1, 1
+    beq $t0, $t1, printOne9
+
+    li $t2, 2
+    beq $t0, $t2, printTwo9
+
+    j printEspaco9
+
+    printOne9:
+        jal is_one
+        j continuar9
+
+    printTwo9:
+        jal is_two
+        j continuar9
+
+    printEspaco9:
+        la $a0, espaco
+        li $v0, 4
+        syscall
+
+    continuar9:
+
+jal verificarVitoria
+
+game_loop:
+
+    la $a0, newline
+    li $v0, 4
+    syscall
+    # Prompt for player input
+    li $v0, 4
+    la $a0, player_prompt
+    syscall
+
+    # Read player input (expecting an integer between 1 and 9)
+    li $v0, 5
+    syscall
+    move $t4, $v0  # $t4 now holds the player's input (1-9)
+    li $t5, 1
+    blt $t4, $t5, mov_invalido
+    li $t5, 9
+    bgt $t4, $t5, mov_invalido
+    li $t5, 1        # Load the value 1 into $t5
+    beq $t4, $t5, r1  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 2        # Load the value 1 into $t5
+    beq $t4, $t5, r2  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 3        # Load the value 1 into $t5
+    beq $t4, $t5, r3  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 4        # Load the value 1 into $t5
+    beq $t4, $t5, r4  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 5        # Load the value 1 into $t5
+    beq $t4, $t5, r5  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 6        # Load the value 1 into $t5
+    beq $t4, $t5, r6  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 7        # Load the value 1 into $t5
+    beq $t4, $t5, r7  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 8        # Load the value 1 into $t5
+    beq $t4, $t5, r8  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 9        # Load the value 1 into $t5
+    beq $t4, $t5, r9  # Branch to "is_equal" if $t4 == $t5
+
+   
+
+r1:
+    lw $t7, return1
+    bnez $t7, mov_invalido
+
+    lw $t5, turno
+
+    andi $t1, $t5, 1 #$t1 will be 2 if it's odd, 1 if it's even
+
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return1 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r2:
+    lw $t7, return2
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0 
+    sw $t1, return2 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r3:
+    lw $t7, return3
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return3 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r4:
+    lw $t7, return4
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return4 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r5:
+    lw $t7, return5
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return5 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1   
+r6:
+    lw $t7, return6
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return6 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r7:
+    lw $t7, return7
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return7 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r8:
+    lw $t7, return8
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return8 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+r9:
+    lw $t7, return9
+    bnez $t7, mov_invalido
+    lw $t5, turno
+    andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
+    li $t0, 1
+    add $t1, $t1, $t0
+    sw $t1, return9 
+    lw $t0, turno
+    # Increment the value of "turn" by 1
+    addi $t0, $t0, 1
+    sw $t0, turno
+    j pos1
+is_one:
+    la $a0, X
+    li $v0, 4
+    syscall
+    jr $ra
+is_two:
+    la $a0, O
+    li $v0, 4
+    syscall
+    jr $ra
+mov_invalido:
+    la $a0, invalido
+    li $v0, 4
+    syscall
+    j game_loop
+
+verificarVitoria:
+
+    # Verificação jogador 1
+    jal caso1O
+    jal caso1X
+    jal caso2O
+    jal caso2X
+    jal caso3O
+    jal caso3X
+    jal caso4O
+    jal caso4X
+    jal caso5O
+    jal caso5X
+    jal caso6O
+    jal caso6X
+    jal caso7O
+    jal caso7X
+    jal caso8O
+    jal caso8X
+    jal empate
+
+    # erificar X
+    caso1O:
+        c1l1:
+            lw $t7, return1
+            beq $t7, 1, c2l1
+            jr $ra
+        c2l1:
+            lw $t7, return2
+            beq $t7, 1, c3l1
+            jr $ra
+        c3l1:
+            lw $t7, return3
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso1X:
+        c1l1_2:
+            lw $t7, return1
+            beq $t7, 2, c2l1_2
+            jr $ra
+        c2l1_2:
+            lw $t7, return2
+            beq $t7, 2, c3l1_2
+            jr $ra
+        c3l1_2:
+            lw $t7, return3
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso2O:
+        c1l1_3:
+            lw $t7, return1
+            beq $t7, 1, c1l2_3
+            jr $ra
+        c1l2_3:
+            lw $t7, return4
+            beq $t7, 1, c1l3_3
+            jr $ra
+        c1l3_3:
+            lw $t7, return7
+            beq $t7, 1, vitoria2
+            jr $ra
+    caso2X:
+        c1l1_4:
+            lw $t7, return1
+            beq $t7, 2, c1l2_4
+            jr $ra
+        c1l2_4:
+            lw $t7, return4
+            beq $t7, 2, c1l3_4
+            jr $ra
+        c1l3_4:
+            lw $t7, return7
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso3O:
+        c1l1_5:
+            lw $t7, return1
+            beq $t7, 1, c2l2_5
+            jr $ra
+        c2l2_5:
+            lw $t7, return5
+            beq $t7, 1, c3l3_5
+            jr $ra
+        c3l3_5:
+            lw $t7, return9
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso3X:
+        c1l1_6:
+            lw $t7, return1
+            beq $t7, 2, c2l2_6
+            jr $ra
+        c2l2_6:
+            lw $t7, return5
+            beq $t7, 2, c3l3_6
+            jr $ra
+        c3l3_6:
+            lw $t7, return9
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso4O:
+        c2l1_7:
+            lw $t7, return2
+            beq $t7, 1, c2l2_7
+            jr $ra
+        c2l2_7:
+            lw $t7, return5
+            beq $t7, 1, c3l2_7
+            jr $ra
+        c3l2_7:
+            lw $t7, return8
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso4X:
+        c2l1_8:
+            lw $t7, return2
+            beq $t7, 2, c2l2_8
+            jr $ra
+        c2l2_8:
+            lw $t7, return5
+            beq $t7, 2, c3l2_8
+            jr $ra
+        c3l2_8:
+            lw $t7, return8
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso5O:
+        c3l1_9:
+            lw $t7, return3
+            beq $t7, 1, c3l2_9
+            jr $ra
+        c3l2_9:
+            lw $t7, return6
+            beq $t7, 1, c3l3_9
+            jr $ra
+        c3l3_9:
+            lw $t7, return9
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso5X:
+        c3l1_0:
+            lw $t7, return3
+            beq $t7, 2, c3l2_0
+            jr $ra
+        c3l2_0:
+            lw $t7, return6
+            beq $t7, 2, c3l3_0
+            jr $ra
+        c3l3_0:
+            lw $t7, return9
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso6O:
+        c3l1_11:
+            lw $t7, return3
+            beq $t7, 1,  c2l2_11
+            jr $ra
+        c2l2_11:
+            lw $t7, return5
+            beq $t7, 1, c1l3_11
+            jr $ra
+        c1l3_11:
+            lw $t7, return7
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso6X:
+        c3l1_22:
+            lw $t7, return3
+            beq $t7, 2, c2l2_22
+            jr $ra
+        c2l2_22:
+            lw $t7, return5
+            beq $t7, 2, c1l3_22
+            jr $ra
+        c1l3_22:
+            lw $t7, return7
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso7O:
+        c1l2_33:
+            lw $t7, return4
+            beq $t7, 1, c2l2_33
+            jr $ra
+        c2l2_33:
+            lw $t7, return5
+            beq $t7, 1, c3l2_33
+            jr $ra
+        c3l2_33:
+            lw $t7, return6
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso7X:
+        c1l2_44:
+            lw $t7, return4
+            beq $t7, 2, c2l2_44
+            jr $ra
+        c2l2_44:
+            lw $t7, return5
+            beq $t7, 2, c3l2_44
+            jr $ra
+        c3l2_44:
+            lw $t7, return6
+            beq $t7, 2, vitoria2
+            jr $ra
+    caso8O:
+        c1l3_55:
+            lw $t7, return7
+            beq $t7, 1, c2l3_55
+            jr $ra
+        c2l3_55:
+            lw $t7, return8
+            beq $t7, 1, c3l3_55
+            jr $ra
+        c3l3_55:
+            lw $t7, return9
+            beq $t7, 1, vitoria1
+            jr $ra
+    caso8X:
+        c1l3_66:
+            lw $t7, return7
+            beq $t7, 2, c2l3_66
+            jr $ra
+        c2l3_66:
+            lw $t7, return8
+            beq $t7, 2, c3l3_66
+            jr $ra
+        c3l3_66:
+            lw $t7, return9
+            beq $t7, 2, vitoria2
+            jr $ra
 
 
-menu: .asciiz "1-iniciar jogo \n0-fim \n" 
+    vitoria1:
+    la $a0, vitoria1_prompt
+    li $v0, 4
+    syscall
+    j exit
+    vitoria2:
+    la $a0, vitoria2_prompt
+    li $v0, 4
+    syscall
+    j exit
+
+empate:
+    jal casoe
+    j game_loop
+
+    casoe:
+        e1:
+            lw $t7, return1
+            beq $t7, 1, e2
+            beq $t7, 2, e2
+            jr $ra
+        e2:
+            lw $t7, return2
+            beq $t7, 1, e3
+            beq $t7, 2, e3
+            jr $ra
+        e3:
+            lw $t7, return3
+            beq $t7, 1, e4
+            beq $t7, 2, e4
+            jr $ra
+        e4:
+            lw $t7, return4
+            beq $t7, 1, e5
+            beq $t7, 2, e5
+            jr $ra
+        e5:
+            lw $t7, return5
+            beq $t7, 1, e6
+            beq $t7, 2, e6
+            jr $ra
+        e6:
+            lw $t7, return6
+            beq $t7, 1, e7
+            beq $t7, 2, e7
+            jr $ra
+        e7:
+            lw $t7, return7
+            beq $t7, 1, e8
+            beq $t7, 2, e8
+            jr $ra
+        e8:
+            lw $t7, return8
+            beq $t7, 1, e9
+            beq $t7, 2, e9
+            jr $ra
+        e9:
+            lw $t7, return9
+            beq $t7, 1, efinal
+            beq $t7, 2, efinal
+            jr $ra
+    efinal:
+        la $a0, empate_prompt
+        li $v0, 4
+        syscall
+        j exit
+exit:
+  li    $v0, 10                       # Finalizar aplicacao
+  syscall
