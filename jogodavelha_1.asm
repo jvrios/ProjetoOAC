@@ -22,17 +22,7 @@ invalido: .asciiz "Movimento inválido\n"
 player_prompt: .asciiz "Enter a number (1-9): "
 .text
 main:
-    # Initialize the board with empty spaces
-    li $t0, 0
-    la $t1, board
-    li $t2, 9
-    li $t3, 32      # ASCII code for space (' ')
-
-init_board_loop:
-    sb $t3, 0($t1)
-    addi $t1, $t1, 1
-    addi $t0, $t0, 1
-    bne $t0, $t2, init_board_loop
+    j pos1
     
 pos1:
     lw $t0, return1
@@ -214,7 +204,7 @@ r1:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r2:
     lw $t7, return2
     bnez $t7, mov_invalido
@@ -226,7 +216,7 @@ r2:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r3:
     lw $t7, return3
     bnez $t7, mov_invalido
@@ -238,7 +228,7 @@ r3:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r4:
     lw $t7, return4
     bnez $t7, mov_invalido
@@ -250,7 +240,7 @@ r4:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r5:
     lw $t7, return5
     bnez $t7, mov_invalido
@@ -262,7 +252,7 @@ r5:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main   
+    j pos1   
 r6:
     lw $t7, return6
     bnez $t7, mov_invalido
@@ -274,7 +264,7 @@ r6:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r7:
     lw $t7, return7
     bnez $t7, mov_invalido
@@ -286,7 +276,7 @@ r7:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r8:
     lw $t7, return8
     bnez $t7, mov_invalido
@@ -298,7 +288,7 @@ r8:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 r9:
     lw $t7, return9
     bnez $t7, mov_invalido
@@ -310,7 +300,7 @@ r9:
     # Increment the value of "turn" by 1
     addi $t0, $t0, 1
     sw $t0, turno
-    j main
+    j pos1
 is_one:
     la $a0, X
     li $v0, 4
