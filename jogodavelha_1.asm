@@ -1,5 +1,5 @@
 .data
-coluna: .asciiz "| "
+coluna: .asciiz "|"
 linha: .asciiz "---+---+---\n"
 newline: .asciiz "\n"
 X: .asciiz " X "
@@ -36,147 +36,138 @@ init_board_loop:
     
 pos1:
     lw $t0, return1
-     # Check if the input value is 0
     li $t1, 1
-    beq $t0, $t1, is_zero
+    beq $t0, $t1, is_one
     li $t2, 2
-    beq $t0, $t2, is_one
+    beq $t0, $t2, is_two
 
-    # If the input value is neither 0 nor 1, print " "
+    # If the input value is neither 1 nor 2, print " "
     la $a0, espaco
-    li $v0, 4
-    syscall
-    la $a0, coluna
     li $v0, 4
     syscall
     j pos2
 pos2:
-    lw $t0, return2
-
-        li $t1, 1
-    beq $t0, $t1, is_zero
-    li $t2, 2
-    beq $t0, $t2, is_one
-
-    la $a0, espaco
+    la $a0, coluna
     li $v0, 4
     syscall
-    la $a0, coluna
+    lw $t0, return2
+    li $t1, 1
+    beq $t0, $t1, is_one
+    li $t2, 2
+    beq $t0, $t2, is_two
+
+    la $a0, espaco
     li $v0, 4
     syscall
     j pos3
 pos3:
+    la $a0, coluna
+    li $v0, 4
+    syscall
     lw $t0, return3
-
     li $t1, 1
-    beq $t0, $t1, is_zero
+    beq $t0, $t1, is_one
     li $t2, 2
-    beq $t0, $t2, is_one
+    beq $t0, $t2, is_two
 
     la $a0, espaco
     li $v0, 4
     syscall
+    j pos4
+pos4:
     la $a0, newline
     li $v0, 4
     syscall
     la $a0, linha
     syscall
-    j pos4
-pos4:
     lw $t0, return4
-
     li $t1, 1
-    beq $t0, $t1, is_zero
+    beq $t0, $t1, is_one
     li $t2, 2
-    beq $t0, $t2, is_one
-
+    beq $t0, $t2, is_two
 
     la $a0, espaco
-    li $v0, 4
-    syscall
-    la $a0, coluna
     li $v0, 4
     syscall
     j pos5
 pos5:
-    lw $t0, return5
-
-    li $t1, 1
-    beq $t0, $t1, is_zero
-    li $t2, 2
-    beq $t0, $t2, is_one
-
-    la $a0, espaco
+    la $a0, coluna
     li $v0, 4
     syscall
-    la $a0, coluna
+    lw $t0, return5
+    li $t1, 1
+    beq $t0, $t1, is_one
+    li $t2, 2
+    beq $t0, $t2, is_two
+
+    la $a0, espaco
     li $v0, 4
     syscall
     j pos6
 pos6:
+    la $a0, coluna
+    li $v0, 4
+    syscall
     lw $t0, return6
-
     li $t1, 1
-    beq $t0, $t1, is_zero
+    beq $t0, $t1, is_one
     li $t2, 2
-    beq $t0, $t2, is_one
+    beq $t0, $t2, is_two
 
     la $a0, espaco
     li $v0, 4
     syscall
+    j pos7
+pos7:
     la $a0, newline
     li $v0, 4
     syscall
     la $a0, linha
     syscall
-    j pos7
-pos7:
     lw $t0, return7
-
     li $t1, 1
-    beq $t0, $t1, is_zero
+    beq $t0, $t1, is_one
     li $t2, 2
-    beq $t0, $t2, is_one
+    beq $t0, $t2, is_two
 
     la $a0, espaco
-    li $v0, 4
-    syscall
-    la $a0, coluna
     li $v0, 4
     syscall
     j pos8
 pos8:
-    lw $t0, return8
-
-    li $t1, 1
-    beq $t0, $t1, is_zero
-    li $t2, 2
-    beq $t0, $t2, is_one
-
-    la $a0, espaco
+    la $a0, coluna
     li $v0, 4
     syscall
-    la $a0, coluna
+    lw $t0, return8
+    li $t1, 1
+    beq $t0, $t1, is_one
+    li $t2, 2
+    beq $t0, $t2, is_two
+
+    la $a0, espaco
     li $v0, 4
     syscall
     j pos9
 pos9:
+    la $a0, coluna
+    li $v0, 4
+    syscall
     lw $t0, return9
 
     li $t1, 1
-    beq $t0, $t1, is_zero
+    beq $t0, $t1, is_one
     li $t2, 2
-    beq $t0, $t2, is_one
+    beq $t0, $t2, is_two
 
     la $a0, espaco
-    li $v0, 4
-    syscall
-    la $a0, newline
     li $v0, 4
     syscall
     j game_loop
 
 game_loop:
+    la $a0, newline
+    li $v0, 4
+    syscall
     # Prompt for player input
     li $v0, 4
     la $a0, player_prompt
@@ -320,16 +311,50 @@ r9:
     addi $t0, $t0, 1
     sw $t0, turno
     j main
-is_zero:
+is_one:
     la $a0, X
     li $v0, 4
     syscall
-    jr $ra
-is_one:
+    li $t5, 1        # Load the value 1 into $t5
+    beq $t4, $t5, pos2  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 2        # Load the value 1 into $t5
+    beq $t4, $t5, pos3  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 3        # Load the value 1 into $t5
+    beq $t4, $t5, pos4  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 4        # Load the value 1 into $t5
+    beq $t4, $t5, pos5  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 5        # Load the value 1 into $t5
+    beq $t4, $t5, pos6  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 6        # Load the value 1 into $t5
+    beq $t4, $t5, pos7  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 7        # Load the value 1 into $t5
+    beq $t4, $t5, pos8  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 8        # Load the value 1 into $t5
+    beq $t4, $t5, pos9  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 9        # Load the value 1 into $t5
+    beq $t4, $t5, game_loop  # Branch to "is_equal" if $t4 == $t5
+is_two:
     la $a0, O
     li $v0, 4
     syscall
-    jr $ra
+    li $t5, 1        # Load the value 1 into $t5
+    beq $t4, $t5, pos2  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 2        # Load the value 1 into $t5
+    beq $t4, $t5, pos3  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 3        # Load the value 1 into $t5
+    beq $t4, $t5, pos4  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 4        # Load the value 1 into $t5
+    beq $t4, $t5, pos5  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 5        # Load the value 1 into $t5
+    beq $t4, $t5, pos6  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 6        # Load the value 1 into $t5
+    beq $t4, $t5, pos7  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 7        # Load the value 1 into $t5
+    beq $t4, $t5, pos8  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 8        # Load the value 1 into $t5
+    beq $t4, $t5, pos9  # Branch to "is_equal" if $t4 == $t5
+    li $t5, 9        # Load the value 1 into $t5
+    beq $t4, $t5, game_loop  # Branch to "is_equal" if $t4 == $t5
 mov_invalido:
     la $a0, invalido
     li $v0, 4
