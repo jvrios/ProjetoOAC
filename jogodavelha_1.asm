@@ -27,7 +27,7 @@ empate_prompt: .asciiz "Empate :("
     lw $t0, turno
     move $t0, $t4
 pos1:
-    lw $a0, turno
+    lw $a0, return5
 
     li $v0, 1
     syscall
@@ -342,6 +342,7 @@ r1:
 r2:
     lw $t7, return2
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0 
@@ -354,6 +355,7 @@ r2:
 r3:
     lw $t7, return3
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
@@ -366,6 +368,7 @@ r3:
 r4:
     lw $t7, return4
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
@@ -378,6 +381,7 @@ r4:
 r5:
     lw $t7, return5
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
@@ -390,6 +394,7 @@ r5:
 r6:
     lw $t7, return6
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
@@ -402,6 +407,7 @@ r6:
 r7:
     lw $t7, return7
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
@@ -414,6 +420,7 @@ r7:
 r8:
     lw $t7, return8
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
@@ -426,6 +433,7 @@ r8:
 r9:
     lw $t7, return9
     bnez $t7, mov_invalido
+    lw $t5, turno
     andi $t1, $t5, 1 #$t1 will be 1 if it's odd, 0 if it's even
     li $t0, 1
     add $t1, $t1, $t0
